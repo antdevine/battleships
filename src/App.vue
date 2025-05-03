@@ -23,6 +23,11 @@ for (let i = 1; i <= 10; i++) {
 const columnSelected = ref('');
 const rowSelected = ref(0);
 
+const ships = [
+  { name: 'Battleship', size: 5, qty: 1 },
+  { name: 'Destroyer', size: 4, qty: 2 },
+];
+
 onMounted(() => {
   board.value[1]['A'].isShip = true;
   board.value[1]['B'].isShip = true;
@@ -98,6 +103,10 @@ const checkShip = (event) => {
   } else {
     board.value[rowSelected.value][columnSelected.value].isMiss = true;
   }
+}
+
+const addShips = () => {
+  // Map through the ships array and add ships to the board randomly
 }
 
 </script>
