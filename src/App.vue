@@ -14,6 +14,7 @@ for (let i = 1; i <= 10; i++) {
       isMiss: false,
       isShip: false,
       isShipSunk: false,
+      locationOfCompleteShip: [],
     };
   });
   board.value[i] = row;
@@ -23,15 +24,42 @@ const columnSelected = ref('');
 const rowSelected = ref(0);
 
 onMounted(() => {
-  // board.value[1]['A'].isShip = true;
-  // board.value[1]['B'].isHit = true;
-  // board.value[2]['C'].isMiss = true;
-  // board.value[3]['D'].isShipSunk = true;
   board.value[1]['A'].isShip = true;
   board.value[1]['B'].isShip = true;
   board.value[1]['C'].isShip = true;
   board.value[1]['D'].isShip = true;
   board.value[1]['E'].isShip = true;
+
+  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['A'].id);
+  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['B'].id);
+  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['C'].id);
+  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['D'].id);
+  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['E'].id);
+
+  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['A'].id);
+  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['B'].id);
+  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['C'].id);
+  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['D'].id);
+  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['E'].id);
+
+  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['A'].id);
+  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['B'].id);
+  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['C'].id);
+  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['D'].id);
+  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['E'].id);
+
+  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['A'].id);
+  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['B'].id);
+  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['C'].id);
+  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['D'].id);
+  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['E'].id);
+
+  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['A'].id);
+  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['B'].id);
+  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['C'].id);
+  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['D'].id);
+  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['E'].id);
+
 
   board.value[4]['C'].isShip = true;
   board.value[5]['C'].isShip = true;
@@ -46,10 +74,27 @@ onMounted(() => {
 
 const checkShip = (event) => {
   event.preventDefault();
-  console.log('Selected Column:', columnSelected.value);
-  console.log('Selected Row:', rowSelected.value);
   if(board.value[rowSelected.value][columnSelected.value].isShip) {
+    if(board.value[rowSelected.value][columnSelected.value].isShipSunk) {
+      alert('This ship has already been sunk!');
+      return;
+    }
     board.value[rowSelected.value][columnSelected.value].isHit = true;
+    const shipLocation = board.value[rowSelected.value][columnSelected.value].locationOfCompleteShip;
+    const checkSunk = shipLocation.map(location => {
+      const [row, col] = location.split('');
+      return board.value[Number(row)][col].isHit;
+    });
+    if(checkSunk.includes(false)) {
+      alert('You hit a ship!');
+    } else {
+      shipLocation.forEach(location => {
+        const [row, col] = location.split('');
+        board.value[Number(row)][col].isShipSunk = true;
+      });
+      alert('You sunk a ship!');
+    }
+    
   } else {
     board.value[rowSelected.value][columnSelected.value].isMiss = true;
   }
@@ -119,7 +164,7 @@ const checkShip = (event) => {
         :key="colKey"
         class="w-10 h-10 flex items-center justify-center border"
       >
-        {{  cell.isHit ? '💥' : cell.isMiss ? '❌' : cell.isShip ? '🚢' : '' }}
+        {{  cell.isShipSunk ? '🚢🌊' : cell.isHit ? '💥' : cell.isMiss ? '❌' : cell.isShip ? '🚢' : '' }}
       </div>
     </div>
   </div>
