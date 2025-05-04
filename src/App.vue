@@ -1,5 +1,5 @@
 <script setup>
- import { ref, onMounted } from 'vue';
+ import { ref } from 'vue';
 
  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
@@ -22,60 +22,13 @@ for (let i = 1; i <= 10; i++) {
 
 const columnSelected = ref('');
 const rowSelected = ref(0);
+let startingCell = ref({});
+let nextShipCoordinates = [];
 
 const ships = [
   { name: 'Battleship', size: 5, qty: 1 },
   { name: 'Destroyer', size: 4, qty: 2 },
 ];
-
-onMounted(() => {
-  board.value[1]['A'].isShip = true;
-  board.value[1]['B'].isShip = true;
-  board.value[1]['C'].isShip = true;
-  board.value[1]['D'].isShip = true;
-  board.value[1]['E'].isShip = true;
-
-  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['A'].id);
-  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['B'].id);
-  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['C'].id);
-  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['D'].id);
-  board.value[1]['A'].locationOfCompleteShip.push(board.value[1]['E'].id);
-
-  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['A'].id);
-  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['B'].id);
-  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['C'].id);
-  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['D'].id);
-  board.value[1]['B'].locationOfCompleteShip.push(board.value[1]['E'].id);
-
-  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['A'].id);
-  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['B'].id);
-  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['C'].id);
-  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['D'].id);
-  board.value[1]['C'].locationOfCompleteShip.push(board.value[1]['E'].id);
-
-  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['A'].id);
-  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['B'].id);
-  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['C'].id);
-  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['D'].id);
-  board.value[1]['D'].locationOfCompleteShip.push(board.value[1]['E'].id);
-
-  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['A'].id);
-  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['B'].id);
-  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['C'].id);
-  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['D'].id);
-  board.value[1]['E'].locationOfCompleteShip.push(board.value[1]['E'].id);
-
-
-  board.value[4]['C'].isShip = true;
-  board.value[5]['C'].isShip = true;
-  board.value[6]['C'].isShip = true;
-  board.value[7]['C'].isShip = true;
-
-  board.value[9]['C'].isShip = true;
-  board.value[9]['D'].isShip = true;
-  board.value[9]['E'].isShip = true;
-  board.value[9]['F'].isShip = true;
-});
 
 const checkShip = (event) => {
   event.preventDefault();
@@ -105,13 +58,120 @@ const checkShip = (event) => {
   }
 }
 
-const addShips = () => {
-  // Map through the ships array and add ships to the board randomly
+const initialShipPosition = () => {
+  // Generate a random number seperate for letters and numbers otherwise it will be the same pair each time
+  const randomNumberLetter = Math.floor(Math.random() * 10);
+  // Numbers array dont start at 0 so adding 1
+  const randomNumber = Math.floor(Math.random() * 10) + 1;
+  // Generate a random letter from A to J
+  const randomLetter = letters[randomNumberLetter];
+  startingCell = board.value[randomNumber][randomLetter];
+}
+
+const horizontalCheck = (rowNumber, colLetter, size) => {
+  const startIndex = letters.indexOf(colLetter);
+  const coordinates = [];
+
+  if (startIndex + size <= letters.length) {
+    for (let j = 0; j < size; j++) {
+      const letter = letters[startIndex + j];
+      coordinates.push(`${rowNumber}${letter}`);
+    }
+  }
+
+  return coordinates;
+};
+
+const verticalCheck = (rowNumber, colLetter, size) => {
+  const coordinates = [];
+
+  if (rowNumber + size <= 10) {
+    for (let j = 0; j < size; j++) {
+      const number = rowNumber + j;
+      coordinates.push(`${number}${colLetter}`);
+    }
+  }
+
+  return coordinates;
+};
+
+
+const setShips = (size, qty) => {
+  for (let i = 0; i < qty; i++) {
+    let found = false;
+
+    while (!found) {
+      initialShipPosition();
+
+      if (!startingCell.isShip) {
+        const rowNumber = parseInt(startingCell.id.match(/\d+/)[0]);
+        const colLetter = startingCell.id.match(/[A-Z]/i)[0];
+        
+        nextShipCoordinates = horizontalCheck(rowNumber, colLetter, size);
+
+        if(nextShipCoordinates.length === 0) {
+          nextShipCoordinates = verticalCheck(rowNumber, colLetter, size);
+        }
+        
+
+          // Check if all coordinates are empty
+          const canPlaceShip = nextShipCoordinates.every(coord => {
+            const row = parseInt(coord.match(/\d+/)[0]);
+            const col = coord.match(/[A-Z]/i)[0];
+            return !board.value[row][col].isShip;
+          });
+
+          
+
+          if (canPlaceShip) {
+            nextShipCoordinates.forEach(coord => {
+              const row = parseInt(coord.match(/\d+/)[0]);
+              const col = coord.match(/[A-Z]/i)[0];
+
+              board.value[row][col].isShip = true;
+              board.value[row][col].locationOfCompleteShip = [...nextShipCoordinates];
+
+              found = true;
+            });
+
+            
+          } else {
+            startingCell.isShip = false;
+            continue;
+          }
+        }
+      }
+    }
+  }
+
+const addShips = (event) => {
+  event.preventDefault();
+
+  // Reset the board
+  for (let i = 1; i <= 10; i++) {
+    const row = {};
+    letters.forEach(letter => {
+      row[letter] = { 
+        id: `${i}${letter}`,
+        isHit: false,
+        isMiss: false,
+        isShip: false,
+        isShipSunk: false,
+        locationOfCompleteShip: [],
+      };
+    });
+    board.value[i] = row;
+  }
+  ships.map((ship) => {
+    setShips(ship.size, ship.qty);
+  })
 }
 
 </script>
 
 <template>
+
+  <button @click="addShips">New game</button>
 
   <form>
     <select v-model="columnSelected">
