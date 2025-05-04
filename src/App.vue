@@ -1,5 +1,9 @@
 <script setup>
  import { ref } from 'vue';
+import StartGameForm from './components/startGameForm.vue';
+import targetShipSelect from './components/targetShipSelect.vue';
+import sidebarInfo from './components/sidebarInfo.vue';
+import boardGid from './components/boardGrid.vue';
 
  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
@@ -34,8 +38,18 @@ const ships = [
   { type: 'Destroyer', size: 4, qty: 2, qtySank: 0 },
 ];
 
-const targetShip = (event) => {
-  event.preventDefault();
+const startGame = ( name ) => {
+  playerName.value = name;
+  addShips();
+};
+
+const targetShipCordinates = ( { column, row} ) => {
+  rowSelected.value = Number(row);
+  columnSelected.value = column;
+  targetShip();
+}
+
+const targetShip = () => {
   attempts.value++;
 
   if(board.value[rowSelected.value][columnSelected.value].isShip) {
@@ -162,8 +176,6 @@ const setShips = (size, qty, type) => {
   }
 
 const addShips = (event) => {
-  event.preventDefault();
-
   // Reset the board
   for (let i = 1; i <= 10; i++) {
     const row = {};
@@ -199,95 +211,21 @@ const addShips = (event) => {
 
 <template>
 
-<form v-if="!gameStarted" class="flex flex-row gap-4">
-    <label for="playerName" class="content-center">Enter your name:</label>
-    <input type="text" id="playerName" v-model="playerName" placeholder="Enter your name" class="p-2" />
-    <button :disabled="playerName === ''" @click="addShips">Start Game</button>
-  </form>
+<StartGameForm v-if="!gameStarted" @start-game="startGame" />
 
-<div v-if="gameStarted" class="flex flex-row justify-between gap-4 mb-10">
-  <form class="flex flex-row gap-4">
-    <select v-model="columnSelected" class="cursor-pointer">
-      <option disabled value="">Select a Column</option>
-      <option value="A">Column A</option>
-      <option value="B">Column B</option>
-      <option value="C">Column C</option>
-      <option value="D">Column D</option>
-      <option value="E">Column E</option>
-      <option value="F">Column F</option>
-      <option value="G">Column G</option>
-      <option value="H">Column H</option>
-      <option value="I">Column I</option>
-      <option value="J">Column J</option>
-    </select>
-
-    <select v-model="rowSelected" class="cursor-pointer">
-      <option disabled value=0>Select a Row</option>
-      <option value=1>Row 1</option>
-      <option value=2>Row 2</option>
-      <option value=3>Row 3</option>
-      <option value=4>Row 4</option>
-      <option value=5>Row 5</option>
-      <option value=6>Row 6</option>
-      <option value=7>Row 7</option>
-      <option value=8>Row 8</option>
-      <option value=9>Row 9</option>
-      <option value=10>Row 10</option>
-    </select>
-    <button :disabled="columnSelected === '' || rowSelected === 0" @click="targetShip">Target Ship</button>
-  </form>
-
+<div class="flex flex-row justify-between gap-4 mb-10" v-if="gameStarted">
+  <targetShipSelect @target-ship-cordinates="targetShipCordinates" />
   <button @click="addShips">New game</button>
 </div>
-  
 
   <div class="flex flex-wrap flex-col md:flex-row gap-4" v-if="gameStarted">
-    <div class="flex flex-col gap-1">
-    <!-- Top header (A–J) -->
-    <div class="grid grid-cols-11 gap-1">
-      <div class="w-10 h-10"></div> <!-- Empty corner -->
-      <div
-        v-for="letter in letters"
-        :key="'header-' + letter"
-        class="w-10 h-10 flex items-center justify-center font-bold"
-      >
-        {{ letter }}
-      </div>
-    </div>
+    
+    <boardGid :board="board" :letters="letters" />
 
-    <!-- Rows with side numbers -->
-    <div
-      v-for="(row, rowIndex) in board"
-      :key="'row-' + rowIndex"
-      class="grid grid-cols-11 gap-1"
-    >
-      <!-- Row number -->
-      <div class="w-10 h-10 flex items-center justify-center font-bold">
-        {{ rowIndex }}
-      </div>
-
-      <!-- Cells -->
-      <div
-        v-for="(cell, colKey) in row"
-        :key="colKey"
-        class="w-10 h-10 flex items-center justify-center border min-w-[50px]"
-      >
-        {{  cell.isShipSunk ? '🚢🌊' : cell.isHit ? '💥' : cell.isMiss ? '❌' : cell.isShip ? '🚢' : '' }}
-      </div>
-    </div>
-  </div>
-
-  <div class="flex flex-col gap-4 ml-8" v-if="gameStarted">
-    <h1 class="text-lg font-bold">Battleship Game - Player: {{ playerName }}</h1>
-
-    <h2 class="text-lg font-bold">Ships</h2>
-    <ul>
-      <li v-for="ship in ships" :key="ship.type">
-        {{ ship.type }}: {{ ship.qty - ship.qtySank }} remaining
-      </li>
-    </ul>
-    <p>Attempts: {{ attempts }}</p>
-  </div>
+  <sidebarInfo
+    :ships="ships"
+    :attempts="attempts"
+    :playerName="playerName" v-if="gameStarted" />
 </div>
   
 </template>
