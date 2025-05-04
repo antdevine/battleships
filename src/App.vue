@@ -15,6 +15,7 @@ for (let i = 1; i <= 10; i++) {
       isShip: false,
       isShipSunk: false,
       locationOfCompleteShip: [],
+      shipType: '',
     };
   });
   board.value[i] = row;
@@ -24,14 +25,17 @@ const columnSelected = ref('');
 const rowSelected = ref(0);
 let startingCell = ref({});
 let nextShipCoordinates = [];
+const attempts = ref(0);
 
 const ships = [
-  { name: 'Battleship', size: 5, qty: 1 },
-  { name: 'Destroyer', size: 4, qty: 2 },
+  { type: 'Battleship', size: 5, qty: 1, qtySank: 0 },
+  { type: 'Destroyer', size: 4, qty: 2, qtySank: 0 },
 ];
 
-const checkShip = (event) => {
+const targetShip = (event) => {
   event.preventDefault();
+  attempts.value++;
+
   if(board.value[rowSelected.value][columnSelected.value].isShip) {
     if(board.value[rowSelected.value][columnSelected.value].isShipSunk) {
       alert('This ship has already been sunk!');
@@ -50,7 +54,18 @@ const checkShip = (event) => {
         const [row, col] = location.split('');
         board.value[Number(row)][col].isShipSunk = true;
       });
-      alert('You sunk a ship!');
+      alert(`You sunk a ${board.value[rowSelected.value][columnSelected.value].shipType}!`);
+      ships.map((ship) => {
+        if(ship.type === board.value[rowSelected.value][columnSelected.value].shipType) {
+          ship.qtySank++;
+          if(ship.qtySank === ship.qty) {
+            alert(`You sunk all ${ship.type}s!`);
+          }
+        }
+      });
+      if (ships.every(ship => ship.qtySank === ship.qty)) {
+          alert(`You won the game! You have sunk all ships in ${attempts.value} attempts!  Try again to beat your score!`);
+        }
     }
     
   } else {
@@ -96,7 +111,7 @@ const verticalCheck = (rowNumber, colLetter, size) => {
 };
 
 
-const setShips = (size, qty) => {
+const setShips = (size, qty, type) => {
   for (let i = 0; i < qty; i++) {
     let found = false;
 
@@ -130,7 +145,7 @@ const setShips = (size, qty) => {
 
               board.value[row][col].isShip = true;
               board.value[row][col].locationOfCompleteShip = [...nextShipCoordinates];
-
+              board.value[row][col].shipType = type;
               found = true;
             });
 
@@ -158,12 +173,13 @@ const addShips = (event) => {
         isShip: false,
         isShipSunk: false,
         locationOfCompleteShip: [],
+        shipType: '',
       };
     });
     board.value[i] = row;
   }
   ships.map((ship) => {
-    setShips(ship.size, ship.qty);
+    setShips(ship.size, ship.qty, ship.type);
   })
 }
 
@@ -201,9 +217,11 @@ const addShips = (event) => {
       <option value=9>Row 9</option>
       <option value=10>Row 10</option>
     </select>
-    <button :disabled="columnSelected === '' || rowSelected === 0" @click="checkShip">Target Ship</button>
+    <button :disabled="columnSelected === '' || rowSelected === 0" @click="targetShip">Target Ship</button>
   </form>
-  <div class="flex flex-col gap-1">
+
+  <div class="flex flex-row gap-4">
+    <div class="flex flex-col gap-1">
     <!-- Top header (A–J) -->
     <div class="grid grid-cols-11 gap-1">
       <div class="w-10 h-10"></div> <!-- Empty corner -->
@@ -237,5 +255,17 @@ const addShips = (event) => {
       </div>
     </div>
   </div>
+
+  <div>
+    <h2 class="text-lg font-bold">Ships</h2>
+    <ul>
+      <li v-for="ship in ships" :key="ship.type">
+        {{ ship.type }}: {{ ship.qty - ship.qtySank }} remaining
+      </li>
+    </ul>
+    <p>Attempts: {{ attempts }}</p>
+  </div>
+  </div>
+  
 </template>
 
