@@ -21,6 +21,8 @@ for (let i = 1; i <= 10; i++) {
   board.value[i] = row;
 }
 
+const gameStarted = ref(false);
+const playerName = ref('');
 const columnSelected = ref('');
 const rowSelected = ref(0);
 let startingCell = ref({});
@@ -181,16 +183,31 @@ const addShips = (event) => {
   ships.map((ship) => {
     setShips(ship.size, ship.qty, ship.type);
   })
+  gameStarted.value = true;
+  attempts.value = 0;
+  columnSelected.value = '';
+  rowSelected.value = 0;
+  startingCell.value = {};
+  nextShipCoordinates = [];
+  // Reset the ships
+  ships.map((ship) => {
+    ship.qtySank = 0;
+  });
 }
 
 </script>
 
 <template>
 
-  <button @click="addShips">New game</button>
+<form v-if="!gameStarted" class="flex flex-row gap-4">
+    <label for="playerName" class="content-center">Enter your name:</label>
+    <input type="text" id="playerName" v-model="playerName" placeholder="Enter your name" class="p-2" />
+    <button :disabled="playerName === ''" @click="addShips">Start Game</button>
+  </form>
 
-  <form>
-    <select v-model="columnSelected">
+<div v-if="gameStarted" class="flex flex-row justify-between gap-4 mb-10">
+  <form class="flex flex-row gap-4">
+    <select v-model="columnSelected" class="cursor-pointer">
       <option disabled value="">Select a Column</option>
       <option value="A">Column A</option>
       <option value="B">Column B</option>
@@ -204,7 +221,7 @@ const addShips = (event) => {
       <option value="J">Column J</option>
     </select>
 
-    <select v-model="rowSelected">
+    <select v-model="rowSelected" class="cursor-pointer">
       <option disabled value=0>Select a Row</option>
       <option value=1>Row 1</option>
       <option value=2>Row 2</option>
@@ -220,7 +237,11 @@ const addShips = (event) => {
     <button :disabled="columnSelected === '' || rowSelected === 0" @click="targetShip">Target Ship</button>
   </form>
 
-  <div class="flex flex-row gap-4">
+  <button @click="addShips">New game</button>
+</div>
+  
+
+  <div class="flex flex-wrap flex-col md:flex-row gap-4" v-if="gameStarted">
     <div class="flex flex-col gap-1">
     <!-- Top header (A–J) -->
     <div class="grid grid-cols-11 gap-1">
@@ -249,14 +270,16 @@ const addShips = (event) => {
       <div
         v-for="(cell, colKey) in row"
         :key="colKey"
-        class="w-10 h-10 flex items-center justify-center border"
+        class="w-10 h-10 flex items-center justify-center border min-w-[50px]"
       >
         {{  cell.isShipSunk ? '🚢🌊' : cell.isHit ? '💥' : cell.isMiss ? '❌' : cell.isShip ? '🚢' : '' }}
       </div>
     </div>
   </div>
 
-  <div>
+  <div class="flex flex-col gap-4 ml-8" v-if="gameStarted">
+    <h1 class="text-lg font-bold">Battleship Game - Player: {{ playerName }}</h1>
+
     <h2 class="text-lg font-bold">Ships</h2>
     <ul>
       <li v-for="ship in ships" :key="ship.type">
@@ -265,7 +288,7 @@ const addShips = (event) => {
     </ul>
     <p>Attempts: {{ attempts }}</p>
   </div>
-  </div>
+</div>
   
 </template>
 
