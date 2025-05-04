@@ -1,11 +1,11 @@
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
-const emit = defineEmits(['startGame']);
-const submitName = ref('');
+const emit = defineEmits(["startGame"]);
+const submitName = ref("");
 
 const submit = () => {
-  emit('startGame', submitName.value);
+  emit("startGame", submitName.value);
 };
 </script>
 

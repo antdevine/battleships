@@ -1,21 +1,22 @@
 <script setup>
 const props = defineProps({
-    board: {
-        type: Object,
-        required: true,
-    },
-    letters: {
-        type: Array,
-        required: true,
-    },
+  board: {
+    type: Object,
+    required: true,
+  },
+  letters: {
+    type: Array,
+    required: true,
+  },
 });
 </script>
 
 <template>
-    <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1">
     <!-- Top header (A–J) -->
     <div class="grid grid-cols-11 gap-1">
-      <div class="w-10 h-10"></div> <!-- Empty corner -->
+      <div class="w-10 h-10"></div>
+      <!-- Empty corner -->
       <div
         v-for="letter in letters"
         :key="'header-' + letter"
@@ -42,7 +43,17 @@ const props = defineProps({
         :key="colKey"
         class="w-10 h-10 flex items-center justify-center border min-w-[50px]"
       >
-        {{  cell.isShipSunk ? '🚢🌊' : cell.isHit ? '💥' : cell.isMiss ? '❌' : cell.isShip ? '🚢' : '' }}
+        {{
+          cell.isShipSunk
+            ? "🚢🌊"
+            : cell.isHit
+            ? "💥"
+            : cell.isMiss
+            ? "❌"
+            : cell.isShip
+            ? "🚢"
+            : ""
+        }}
       </div>
     </div>
   </div>

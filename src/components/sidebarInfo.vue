@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const props = defineProps({
   ships: {
@@ -18,8 +18,10 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="flex flex-col gap-4 ml-8">
-    <h1 class="text-lg font-bold">Battleship Game - Player: {{ playerName }}</h1>
+  <div class="flex flex-col gap-4 ml-8">
+    <h1 class="text-lg font-bold">
+      Battleship Game - Player: {{ playerName }}
+    </h1>
 
     <h2 class="text-lg font-bold">Ships</h2>
     <ul>
