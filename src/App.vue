@@ -17,21 +17,34 @@ const {
   ships,
   startGame,
   addShips,
-  targetShipCordinates
+  targetShipCordinates,
 } = useGame();
 </script>
 
 <template>
   <StartGameForm v-if="!gameStarted" @start-game="startGame" />
 
-  <div class="flex flex-wrap flex-row justify-between gap-4 mb-10" v-if="gameStarted">
+  <div
+    class="flex flex-wrap flex-row justify-between gap-4 mb-10"
+    v-if="gameStarted"
+  >
     <targetShipSelect @target-ship-cordinates="targetShipCordinates" />
     <button @click="addShips">New game</button>
-    <button @click="showShipLocations = !showShipLocations">{{ showShipLocations ? 'Hide ship locations' : 'Cheat mode(Reveal ship locations)' }}</button>
+    <button @click="showShipLocations = !showShipLocations">
+      {{
+        showShipLocations
+          ? "Hide ship locations"
+          : "Cheat mode(Reveal ship locations)"
+      }}
+    </button>
   </div>
 
   <div class="flex flex-wrap flex-col md:flex-row gap-4" v-if="gameStarted">
-    <boardGid :board="board" :letters="letters" :showShipLocations="showShipLocations" />
+    <boardGid
+      :board="board"
+      :letters="letters"
+      :showShipLocations="showShipLocations"
+    />
 
     <sidebarInfo
       :ships="ships"
