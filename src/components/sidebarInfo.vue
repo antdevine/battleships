@@ -17,9 +17,7 @@ const props = defineProps({
 
 <template>
   <div class="flex flex-col gap-4 ml-8 text-left">
-    <h1 class="text-lg font-bold">
-      Battleship Game - Player: {{ playerName }}
-    </h1>
+    <h2 class="text-lg font-bold">Player: {{ playerName }}</h2>
 
     <div>
       <h2 class="text-lg font-bold">Ships</h2>

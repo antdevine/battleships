@@ -6,6 +6,7 @@ export function useGame() {
   const board = ref({});
 
   const resetBoard = () => {
+    //Initial state for the board where each cell is set to false and empty
     for (let i = 1; i <= 10; i++) {
       const row = {};
       letters.forEach((letter) => {
@@ -52,10 +53,13 @@ export function useGame() {
     attempts.value++;
 
     if (board.value[rowSelected.value][columnSelected.value].isShip) {
+      // Check if the ship has already been sunk
       if (board.value[rowSelected.value][columnSelected.value].isShipSunk) {
         alert("This ship has already been sunk!");
         return;
       }
+      // Sets the ship to be hit and then checks if it is sunk by looking at the other coordinates in locationOfCompleteShip
+      // It sees if any of them are false and if they are it says you hit a ship but if they are all true it will say you sunk a ship
       board.value[rowSelected.value][columnSelected.value].isHit = true;
       const shipLocation =
         board.value[rowSelected.value][columnSelected.value]
@@ -64,6 +68,7 @@ export function useGame() {
         const [row, col] = location.split("");
         return board.value[Number(row)][col].isHit;
       });
+      
       if (checkSunk.includes(false)) {
         alert("You hit a ship!");
       } else {
@@ -76,6 +81,7 @@ export function useGame() {
             board.value[rowSelected.value][columnSelected.value].shipType
           }!`
         );
+        // Check if all ships of a certain type have been sunk
         ships.map((ship) => {
           if (
             ship.type ===
@@ -87,6 +93,8 @@ export function useGame() {
             }
           }
         });
+        // Check if all ships have been sunk
+        // If all ships have been sunk, display a win message
         if (ships.every((ship) => ship.qtySank === ship.qty)) {
           alert(
             `You won the game! You have sunk all ships in ${attempts.value} attempts!  Try again to beat your score!`
@@ -94,6 +102,7 @@ export function useGame() {
         }
       }
     } else {
+      // If the cell is not a ship, it will set it to be a miss
       board.value[rowSelected.value][columnSelected.value].isMiss = true;
     }
   };
@@ -109,6 +118,7 @@ export function useGame() {
   };
 
   const horizontalCheck = (rowNumber, colLetter, size) => {
+    // Check if the ship can be placed horizontally, if it fits on the board from its initial position
     const startIndex = letters.indexOf(colLetter);
     const coordinates = [];
 
@@ -123,6 +133,7 @@ export function useGame() {
   };
 
   const verticalCheck = (rowNumber, colLetter, size) => {
+    // Check if the ship can be placed vertically, if it fits on the board from its initial position
     const coordinates = [];
 
     if (rowNumber + size <= 10) {
@@ -146,13 +157,14 @@ export function useGame() {
           const rowNumber = parseInt(startingCell.id.match(/\d+/)[0]);
           const colLetter = startingCell.id.match(/[A-Z]/i)[0];
 
+          // Check if the ship can be placed horizontally before vertically
           nextShipCoordinates = horizontalCheck(rowNumber, colLetter, size);
 
           if (nextShipCoordinates.length === 0) {
             nextShipCoordinates = verticalCheck(rowNumber, colLetter, size);
           }
 
-          // Check if all coordinates are empty
+          // Check if all coordinates are empty and if they are then place the ship
           const canPlaceShip = nextShipCoordinates.every((coord) => {
             const row = parseInt(coord.match(/\d+/)[0]);
             const col = coord.match(/[A-Z]/i)[0];
@@ -160,6 +172,7 @@ export function useGame() {
           });
 
           if (canPlaceShip) {
+            // Place the ship on the board and add the data to the cells
             nextShipCoordinates.forEach((coord) => {
               const row = parseInt(coord.match(/\d+/)[0]);
               const col = coord.match(/[A-Z]/i)[0];
@@ -172,6 +185,7 @@ export function useGame() {
               found = true;
             });
           } else {
+            // If the ship cannot be placed it will go back to the beginning of the function and randomly select a new starting point
             startingCell.isShip = false;
             continue;
           }
@@ -181,6 +195,7 @@ export function useGame() {
   };
 
   const addShips = () => {
+    // When you add ships it will reset the board and then add the ships and then it sets all of the other values to their default values
     resetBoard();
     ships.map((ship) => {
       setShips(ship.size, ship.qty, ship.type);

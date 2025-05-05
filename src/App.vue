@@ -24,6 +24,12 @@ const {
 <template>
   <StartGameForm v-if="!gameStarted" @start-game="startGame" />
 
+  <h1
+    v-if="gameStarted"
+    class="text-3xl font-bold mb-8 text-start md:text-center"
+  >
+    Battleships 🚢
+  </h1>
   <div
     class="flex flex-wrap flex-col md:flex-row justify-between gap-4 mb-10"
     v-if="gameStarted"
