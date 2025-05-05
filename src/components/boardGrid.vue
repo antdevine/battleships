@@ -8,6 +8,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  showShipLocations: {
+    type: Boolean,
+    default: false,
+  },
 });
 </script>
 
@@ -50,7 +54,7 @@ const props = defineProps({
             ? "💥"
             : cell.isMiss
             ? "❌"
-            : cell.isShip
+            : cell.isShip && showShipLocations
             ? "🚢"
             : ""
         }}

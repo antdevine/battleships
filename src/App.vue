@@ -32,6 +32,7 @@ const rowSelected = ref(0);
 let startingCell = ref({});
 let nextShipCoordinates = [];
 const attempts = ref(0);
+const showShipLocations = ref(false);
 
 const ships = [
   { type: "Battleship", size: 5, qty: 1, qtySank: 0 },
@@ -217,13 +218,14 @@ const addShips = (event) => {
 <template>
   <StartGameForm v-if="!gameStarted" @start-game="startGame" />
 
-  <div class="flex flex-row justify-between gap-4 mb-10" v-if="gameStarted">
+  <div class="flex flex-wrap flex-row justify-between gap-4 mb-10" v-if="gameStarted">
     <targetShipSelect @target-ship-cordinates="targetShipCordinates" />
     <button @click="addShips">New game</button>
+    <button @click="showShipLocations = !showShipLocations">{{ showShipLocations ? 'Hide ship locations' : 'Cheat mode(Reveal ship locations)' }}</button>
   </div>
 
   <div class="flex flex-wrap flex-col md:flex-row gap-4" v-if="gameStarted">
-    <boardGid :board="board" :letters="letters" />
+    <boardGid :board="board" :letters="letters" :showShipLocations="showShipLocations" />
 
     <sidebarInfo
       :ships="ships"
