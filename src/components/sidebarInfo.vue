@@ -16,17 +16,20 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 ml-8">
+  <div class="flex flex-col gap-4 ml-8 text-left">
     <h1 class="text-lg font-bold">
       Battleship Game - Player: {{ playerName }}
     </h1>
 
-    <h2 class="text-lg font-bold">Ships</h2>
-    <ul>
-      <li v-for="ship in ships" :key="ship.type">
-        {{ ship.type }}: {{ ship.qty - ship.qtySank }} remaining
-      </li>
-    </ul>
-    <p>Attempts: {{ attempts }}</p>
+    <div>
+      <h2 class="text-lg font-bold">Ships</h2>
+      <ul>
+        <li v-for="ship in ships" :key="ship.type">
+          <span class="font-bold text-blue-400">{{ ship.type }}:</span>
+          {{ ship.qty - ship.qtySank }} remaining
+        </li>
+      </ul>
+    </div>
+    <p><span class="font-bold text-blue-400">Attempts:</span> {{ attempts }}</p>
   </div>
 </template>

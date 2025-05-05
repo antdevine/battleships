@@ -25,18 +25,20 @@ const {
   <StartGameForm v-if="!gameStarted" @start-game="startGame" />
 
   <div
-    class="flex flex-wrap flex-row justify-between gap-4 mb-10"
+    class="flex flex-wrap flex-col md:flex-row justify-between gap-4 mb-10"
     v-if="gameStarted"
   >
     <targetShipSelect @target-ship-cordinates="targetShipCordinates" />
-    <button @click="addShips">New game</button>
-    <button @click="showShipLocations = !showShipLocations">
-      {{
-        showShipLocations
-          ? "Hide ship locations"
-          : "Cheat mode(Reveal ship locations)"
-      }}
-    </button>
+    <div class="inline-flex items-baseline gap-2">
+      <button @click="addShips">New game</button>
+      <button @click="showShipLocations = !showShipLocations">
+        {{
+          showShipLocations
+            ? "Hide ship locations"
+            : "Cheat mode(Reveal ship locations)"
+        }}
+      </button>
+    </div>
   </div>
 
   <div class="flex flex-wrap flex-col md:flex-row gap-4" v-if="gameStarted">
